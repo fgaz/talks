@@ -1,0 +1,380 @@
+[font=Sans 80px]
+[center]
+[white]
+[text-color=black]
+[shading-opacity=0.0]
+
+--- [./assets/haskell-logo-light.png] [text-align=center]
+Introduzione al linguaggio Haskell
+
+<small>Socraten 2019-05-30</small>
+
+--- [text-align=center]
+Programmazione
+funzionale
+
+---
+Le funzioni sono "first-class", ossia
+sono valori che possono essere usati
+negli stessi modi di tutti gli altri
+tipi di valori
+
+---
+I programmi Haskell si focalizzano
+sul valutare espressioni
+piuttosto che eseguire istruzioni
+
+---
+<tt>
+  3 * (9 + 5)
+⇒ 3 * 14
+⇒ 42
+</tt>
+
+---
+<tt>
+simple x y z = x * (y + z)
+</tt>
+
+---
+<tt>
+simple 3 9 5
+
+⇒ 3 * (9 + 5)
+⇒ 3 * 14
+⇒ 42
+</tt>
+
+--- [text-align=center]
+Programmazione
+puramente funzionale
+
+--- [text-align=center]
+Trasparenza
+referenziale
+
+---
+Un'espressione è <b>referenzialmente
+trasparente</b> se può essere sostituita
+con il suo valore senza cambiare
+il significato del programma
+
+In altre parole, dato lo stesso input
+viene ritornato sempre lo stesso output
+
+---
+<tt>
+x = x + 1
+</tt>
+
+---
+<tt>
+x = x + 1
+
+  x
+⇒ x + 1
+⇒ (x + 1) + 1
+⇒ ((x + 1) + 1) + 1
+⇒ (((x + 1) + 1) + 1) + 1
+⋮
+</tt>
+
+--- [text-align=center]
+assegnamento
+≠
+definizione
+
+---
+Niente side effect
+
+⇒ niente mutazione
+⇒ niente loop
+⇒ ricorsione
+
+---
+Niente stato!
+
+--- [./assets/ProgrammerInterrupted1.png]
+--- [./assets/ProgrammerInterrupted2.png]
+--- [./assets/ProgrammerInterrupted3.png]
+--- [./assets/ProgrammerInterrupted4.png]
+
+---
+Ragionamento locale
+
+---
+Cosa può fare il compilatore?
+
+---
+È possibile modificare
+l'ordine di esecuzione
+
+---
+Laziness
+
+---
+Somma delle aree di 3 cerchi
+con raggi r1, r2, r3
+
+<tt>
+totalArea r1 r2 r3 = pi * r1 ^ 2
+                   + pi * r2 ^ 2
+                   + pi * r3 ^ 2
+</tt>
+
+---
+<tt>
+circleArea r = pi * r ^ 2
+
+totalArea r1 r2 r3 = circleArea r1
+                   + circleArea r2
+                   + circleArea r3
+</tt>
+
+---
+Pattern matching
+
+<tt>
+fib 0 = 0
+fib 1 = 1
+fib n = fib (n - 1) + fib (n - 2)
+</tt>
+
+---
+<tt>
+and True True = True
+and _    _    = False
+</tt>
+
+laziness ⇒ short circuit
+
+---
+Tipi
+
+---
+<tt>
+seven :: Int
+seven = 7
+</tt>
+
+---
+<tt>
+fib :: Int -> Int
+</tt>
+
+---
+<tt>
+totalArea :: Float -> Float -> Float -> Float
+</tt>
+
+---
+Somma dell'area di <tt>n</tt> cerchi?
+
+<tt>
+r1 = 3
+r2 = 4
+r3 = 5
+
+radii = r1 : r2 : r3 : []
+</tt>
+
+---
+<tt>
+radii :: [Float]
+radii = r1 : r2 : r3 : []
+</tt>
+
+---
+Strutture dati
+
+<tt>
+data ListOfFloat = []
+                 | Float : ListOfFloat
+</tt>
+
+---
+Variabili di tipo
+
+<tt>
+data List a = []
+            | a : List a
+</tt>
+
+---
+<tt>
+totalArea :: [Float] -> Float
+totalArea [] = 0
+</tt>
+
+---
+<tt>
+totalArea :: [Float] -> Float
+totalArea [] = 0
+totalArea (x : xs) = circleArea x + totalArea xs
+</tt>
+
+---
+Square of list
+
+<tt>
+square :: [Int] -> [Int]
+square [] = []
+square (x : xs) = (x ^ 2) : square xs
+</tt>
+
+---
+<tt>
+map :: (a -> b) -> [a] -> [b]
+</tt>
+
+---
+Currying
+
+<tt>
+simple :: (Int, Int, Int) -> Int
+simple (x, y, z)
+</tt>
+
+---
+<tt>
+simple :: Int -> Int -> Int -> Int
+simple x y z = x * (y + z)
+
+simple 1 2 3
+</tt>
+
+---
+<tt>
+simple :: Int -> (Int -> (Int -> Int))
+simple x y z = x * (y + z)
+
+(((simple 1) 2) 3)
+</tt>
+
+---
+Applicazione parziale
+
+<tt>
+simple 1 :: Int -> Int -> Int
+</tt>
+
+---
+<tt>
+increment :: Int -> Int
+increment x = x + 1
+
+map (\x -> increment x) [2,3,4]
+⇒ [3,4,5]
+
+map increment [2,3,4]
+
+map (\x -> x + 1) [2,3,4]
+
+map (+1) [2,3,4]
+</tt>
+
+---
+Composizione di funzioni
+
+<tt>
+(.) :: (b -> c) -> (a -> b) -> a -> c
+(.) g f x = g (f x)
+</tt>
+
+--- [./assets/function-composition.png]
+
+---
+<tt>
+(.) :: (b -> c) -> (a -> b) -> a -> c
+
+totalArea :: [Float] -> Float
+totalArea = sum . map circleArea
+</tt>
+
+---
+Typeclasses - Functor
+
+<tt>
+data List a = []
+            | a : List a
+
+map :: (a -> b) -> [a] -> [b]
+</tt>
+
+---
+<tt>
+data Tree a = Leaf
+            | Branch a (Tree a) (Tree a)
+
+treeMap :: (a -> b) -> Tree a -> Tree b
+</tt>
+
+---
+<tt>
+map     :: (a -> b) -> [a]    -> [b]
+treeMap :: (a -> b) -> Tree a -> Tree b
+</tt>
+
+---
+<tt>
+thingMap :: (a -> b) -> f a -> f b
+</tt>
+
+---
+Una typeclass è una classe di tipi
+che si comportano in modo simile
+
+---
+<tt>
+class Functor f where
+  fmap :: (a -> b) -> f a -> f b
+</tt>
+
+---
+<tt>
+instance Functor [] where
+  fmap = map
+</tt>
+
+---
+<tt>
+data Maybe a = Just a
+             | Nothing
+</tt>
+
+---
+<tt>
+instance Functor Maybe where
+  fmap _ Nothing  = Nothing
+  fmap f (Just a) = Just (f a)
+</tt>
+
+---
+<tt>
+fmap (* 2) (Just 2)
+⇒ Just 4
+
+fmap (+ 5) (Just 2)
+⇒ Just 7
+
+fmap (+ 5) Nothing
+⇒ Nothing
+</tt>
+
+--- [font=Monospace 40px] [text-align=center]
+<u><tt>https://haskell.org</tt></u>
+<tt>#haskell on freenode</tt>
+
+--- [./assets/haskell-ita-logo-light.png] [text-align=center]
+Haskell ITA
+
+<u><tt>https://haskell-ita.it</tt></u>
+<tt>#haskell-it on freenode</tt>
+
+--- [text-align=center]
+<span font="30.0">
+Francesco Gazzetta
+
+<u><tt>https://fgaz.me</tt></u>
+</span>
+
